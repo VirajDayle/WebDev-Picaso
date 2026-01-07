@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Static Todo List</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="todo-container">
+        <h1>My Todo List</h1>
+
+        <!-- Static input (no JS functionality) -->
+        <div class="todo-input">
+            <input type="text" placeholder="Add a new task" />
+            <button onclick="addTodo()">Add</button>
+        </div>
+
+        <!-- Static todo items -->
+        <ul class="todo-list">
+            <li id="l1">
+                <span>Learn HTML & CSS</span>
+                <div class="actions">
+                    <button class="done">✔</button>
+                    <button class="delete" onclick="deleteTodo(1)">✖</button>
+                </div>
+            </li>
+            <li id="l2" class="completed">
+                <span>Workout for 1.5 hours</span>
+                <div class="actions">
+                    <button class="done">✔</button>
+                    <button class="delete" onclick="deleteTodo(2)">✖</button>
+                </div>
+            </li>
+            <li id="l3">
+                <span>Read 10 pages</span>
+                <div class="actions">
+                    <button class="done">✔</button>
+                    <button class="delete" onclick="deleteTodo(3)">✖</button>
+                </div>
+            </li>
+        </ul>
+
+        <div class="footer-note">
+            Static frontend (HTML + CSS only)
+        </div>
+    </div>
+</body>
+<script>
+    const deleteTodo = (id) => {
+        let elementId = document.getElementById(`l${id}`);
+        elementId.parentNode.removeChild(elementId);
+    }
+    const addTodo = () => {
+        const input = document.querySelector('input');
+        if (!input.value.trim()) return;
+
+        const newElement = document.createElement('li');
+
+        newElement.innerHTML = `
+    <span>${input.value}</span>
+    <div class="actions">
+      <button class="done">✔</button>
+      <button class="delete">✖</button>
+    </div>
+  `;
+
+        const parentElement = document.querySelector('.todo-list');
+        parentElement.append(newElement);
+
+        // delete todo
+        newElement.querySelector('.delete').addEventListener('click', () => {
+            newElement.remove();
+        });
+
+        // mark as done
+        newElement.querySelector('.done').addEventListener('click', () => {
+            newElement.classList.toggle('completed');
+        });
+
+        input.value = '';
+    };
+
+</script>
+
+</html>

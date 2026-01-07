@@ -1,0 +1,132 @@
+// ---------- DOM ----------
+const todoList = document.querySelector(".todo-list");
+const input = document.querySelector(".todo-input input");
+const addBtn = document.querySelector("#addBtn");
+const todoInputContainer = document.querySelector(".todo-input");
+
+// ---------- Storage ----------
+const STORAGE_KEY = "todos";
+
+function loadTodos() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveTodos() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+}
+
+// ---------- State ----------
+let todos = loadTodos();
+let editId = null; // null = Add mode, number = Update mode
+
+// ---------- Render ----------
+function renderTodos() {
+  todoList.innerHTML = "";
+
+  const fragment = document.createDocumentFragment();
+
+  todos.forEach(({ id, title, completed }) => {
+    const li = document.createElement("li");
+    li.dataset.id = id;
+    if (completed) li.classList.add("completed");
+
+    li.innerHTML = `
+      <span class="todo-text">${title}</span>
+      <div class="actions">
+        <button class="done" aria-label="Mark done">✔</button>
+        <button class="delete" aria-label="Delete">✖</button>
+      </div>
+    `;
+
+    fragment.appendChild(li);
+  });
+
+  todoList.appendChild(fragment);
+}
+
+// ---------- Helpers ----------
+function enterEditMode(todo, li) {
+  editId = todo.id;
+  input.value = todo.title;
+
+  todoInputContainer.classList.add("update");
+  addBtn.textContent = "Update";
+  li.classList.add("update");
+}
+
+function resetEditMode() {
+  editId = null;
+  input.value = "";
+
+  todoInputContainer.classList.remove("update");
+  addBtn.textContent = "Add";
+
+  document
+    .querySelectorAll(".todo-list li.update")
+    .forEach((li) => li.classList.remove("update"));
+}
+
+// ---------- Event Delegation ----------
+todoList.addEventListener("click", (e) => {
+  const li = e.target.closest("li");
+  if (!li) return;
+
+  const id = Number(li.dataset.id);
+  const todo = todos.find((t) => t.id === id);
+
+  // ✏️ Edit
+  if (e.target.closest(".todo-text")) {
+    enterEditMode(todo, li);
+    return;
+  }
+
+  // 🗑 Delete
+  if (e.target.closest(".delete")) {
+    todos = todos.filter((t) => t.id !== id);
+  }
+
+  // ✅ Toggle complete
+  if (e.target.closest(".done")) {
+    todos = todos.map((t) =>
+      t.id === id ? { ...t, completed: !t.completed } : t
+    );
+  }
+
+  saveTodos();
+  renderTodos();
+});
+
+// ---------- Add / Update ----------
+addBtn.addEventListener("click", () => {
+  const value = input.value.trim();
+  if (!value) return;
+
+  if (editId === null) {
+    // ➕ Add
+    todos.push({
+      id: Date.now(),
+      title: value,
+      completed: false,
+      created: Date.now(),
+    });
+    input.value = "";
+  } else {
+    // ✏️ Update
+    todos = todos.map((todo) =>
+      todo.id === editId ? { ...todo, title: value } : todo
+    );
+    input.value = "";
+    resetEditMode();
+  }
+
+  saveTodos();
+  renderTodos();
+});
+
+// ---------- Init ----------
+renderTodos();
