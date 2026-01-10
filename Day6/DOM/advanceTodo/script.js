@@ -35,13 +35,41 @@ function renderTodos() {
     li.dataset.id = id;
     if (completed) li.classList.add("completed");
 
-    li.innerHTML = `
-      <span class="todo-text">${title}</span>
-      <div class="actions">
-        <button class="done" aria-label="Mark done">✔</button>
-        <button class="delete" aria-label="Delete">✖</button>
-      </div>
-    `;
+    const spanEl = document.createElement("span");
+    const divEl = document.createElement("div");
+    const buttonEl = document.createElement("button");
+
+    li.appendChild(spanEl);
+    divEl.appendChild(buttonEl);
+
+    li.appendChild(divEl);
+
+    // span for todo text
+    const span = document.createElement("span");
+    span.className = "todo-text";
+    span.textContent = title;
+
+    // actions div
+    const actionsDiv = document.createElement("div");
+    actionsDiv.className = "actions";
+
+    // done button
+    const doneBtn = document.createElement("button");
+    doneBtn.className = "done";
+    doneBtn.setAttribute("aria-label", "Mark done");
+    doneBtn.textContent = "✔";
+
+    // delete button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete";
+    deleteBtn.setAttribute("aria-label", "Delete");
+    deleteBtn.textContent = "✖";
+
+    // append buttons to actions
+    actionsDiv.append(doneBtn, deleteBtn);
+
+    // append everything to li
+    li.append(span, actionsDiv);
 
     fragment.appendChild(li);
   });
